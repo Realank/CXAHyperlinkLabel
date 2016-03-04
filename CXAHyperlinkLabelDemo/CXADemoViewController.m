@@ -37,7 +37,7 @@
   self.view.backgroundColor = [UIColor colorWithHue:0 saturation:0 brightness:.9 alpha:1];
   NSArray *URLs;
   NSArray *URLRanges;
-  NSAttributedString *as = [self attributedString:&URLs URLRanges:&URLRanges];
+  NSAttributedString *as = [self attributedString2:&URLs URLRanges:&URLRanges];
   _label = [[CXAHyperlinkLabel alloc] initWithFrame:CGRectZero];
   _label.numberOfLines = 0;
   _label.backgroundColor = [UIColor clearColor];
@@ -54,7 +54,7 @@
 
 - (void)viewWillLayoutSubviews
 {
-  CGFloat margin = 10.;
+  CGFloat margin = 20.;
   CGSize size = CGRectInset(self.view.bounds, margin, margin).size;
   size.height = INT16_MAX;
   CGSize labelSize = [_label sizeThatFits:size];
@@ -102,5 +102,43 @@
   
   return [mas copy];
 }
+
+- (NSAttributedString *)attributedString2:(NSArray *__autoreleasing *)outURLs
+                               URLRanges:(NSArray *__autoreleasing *)outURLRanges
+{
+    NSString *HTMLText = @"hello world http://www.baidu.com dfdsfdsf";
+    NSArray *URLs;
+    NSArray *URLRanges;
+    UIColor *color = [UIColor blackColor];
+    UIFont *font = [UIFont systemFontOfSize:17.0];
+    NSMutableParagraphStyle *mps = [[NSMutableParagraphStyle alloc] init];
+//    mps.lineSpacing = ceilf(font.pointSize * .5);
+//    NSShadow *shadow = [[NSShadow alloc] init];
+//    shadow.shadowColor = [UIColor whiteColor];
+//    shadow.shadowOffset = CGSizeMake(0, 1);
+//    NSString *str = [NSString stringWithHTMLText:HTMLText baseURL:[NSURL URLWithString:@"http://en.wikipedia.org/"] URLs:&URLs URLRanges:&URLRanges];
+    [NSString getURLs:&URLs URLRanges:&URLRanges forPlainText:HTMLText];
+    NSMutableAttributedString *mas = [[NSMutableAttributedString alloc] initWithString:HTMLText attributes:@
+                                      {
+                                          NSForegroundColorAttributeName : color,
+                                          NSFontAttributeName            : font,
+                                          NSParagraphStyleAttributeName  : mps,
+//                                          NSShadowAttributeName          : shadow,
+                                      }];
+    
+    [URLRanges enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop){
+        [mas addAttributes:@
+         {
+             NSForegroundColorAttributeName : [UIColor blueColor],
+             NSUnderlineStyleAttributeName  : @(NSUnderlineStyleSingle)
+         } range:[obj rangeValue]];
+    }];
+    
+    *outURLs = URLs;
+    *outURLRanges = URLRanges;
+    
+    return [mas copy];
+}
+
 
 @end
